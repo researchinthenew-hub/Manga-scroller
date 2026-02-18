@@ -1,0 +1,63 @@
+/* ─── MangaScroll Pro — On-Page HUD Overlay v2 ──────────────────────────────── */
+
+#__ms_hud {
+  position: fixed !important;
+  top: 16px !important;
+  right: 16px !important;
+  z-index: 2147483647 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  gap: 6px !important;
+  pointer-events: none !important;
+  font-family: 'Space Mono', 'Courier New', monospace !important;
+}
+
+#__ms_pill {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: rgba(13, 13, 15, 0.88) !important;
+  border: 1px solid rgba(42, 42, 53, 0.9) !important;
+  border-radius: 20px !important;
+  padding: 5px 12px 5px 10px !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.45) !important;
+}
+
+#__ms_dot {
+  font-size: 8px !important;
+  color: #666680 !important;
+  transition: color 0.3s !important;
+  line-height: 1 !important;
+}
+
+#__ms_label {
+  font-size: 10px !important;
+  color: #e8e8f0 !important;
+  letter-spacing: 1px !important;
+  text-transform: uppercase !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+#__ms_toast {
+  background: rgba(13, 13, 15, 0.92) !important;
+  border: 1px solid rgba(255, 77, 109, 0.45) !important;
+  border-radius: 8px !important;
+  padding: 5px 12px !important;
+  font-size: 11px !important;
+  color: #ff8fa3 !important;
+  letter-spacing: 0.5px !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 8px rgba(255,77,109,0.15) !important;
+  opacity: 0 !important;
+  transform: translateY(-6px) !important;
+  transition: opacity 0.2s ease, transform 0.2s ease !important;
+  min-width: 130px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}

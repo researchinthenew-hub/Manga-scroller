@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MangaScroll Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0d0f;
+      --panel: #131318;
+      --border: #2a2a35;
+      --accent: #ff4d6d;
+      --accent2: #ff8fa3;
+      --text: #e8e8f0;
+      --muted: #666680;
+      --green: #39d98a;
+      --yellow: #ffd166;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 320px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 15px;
+      overflow: hidden;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: linear-gradient(135deg, #1a0010 0%, #0d0d1a 100%);
+      padding: 16px 18px 14px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 100px; height: 100px;
+      background: radial-gradient(circle, rgba(255,77,109,0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 14px rgba(255,77,109,0.5);
+      flex-shrink: 0;
+    }
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+    .title span { color: var(--accent); }
+    .subtitle {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-left: 42px;
+    }
+
+    /* ── STATUS BAR ── */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 18px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+    }
+    .status-dot {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: all 0.3s;
+    }
+    .dot.active { background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 1.5s infinite; }
+    .dot.paused { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+    /* ── MAIN TOGGLE ── */
+    .main-section {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .toggle-label {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .toggle {
+      position: relative;
+      width: 52px; height: 28px;
+    }
+    .toggle input { display: none; }
+    .toggle-track {
+      position: absolute; inset: 0;
+      background: #1e1e28;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .toggle-thumb {
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: all 0.3s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .toggle input:checked + .toggle-track { background: rgba(255,77,109,0.2); border-color: var(--accent); }
+    .toggle input:checked + .toggle-track .toggle-thumb {
+      left: 27px;
+      background: var(--accent);
+      box-shadow: 0 0 10px rgba(255,77,109,0.6);
+    }
+
+    /* ── SPEED CONTROL ── */
+    .speed-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+    .speed-label {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+    }
+    .speed-value {
+      font-family: 'Space Mono', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -1px;
+    }
+    .speed-value span { font-size: 11px; color: var(--muted); font-weight: 400; }
+
+    .slider-wrap { position: relative; padding: 6px 0; }
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(255,77,109,0.5);
+      transition: transform 0.15s;
+    }
+    input[type=range]:hover::-webkit-slider-thumb { transform: scale(1.2); }
+    .slider-marks {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+    .slider-marks span {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      color: var(--muted);
+    }
+
+    /* ── SPEED PRESETS ── */
+    .presets {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-top: 12px;
+    }
+    .preset-btn {
+      background: #1a1a24;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 6px 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .preset-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .preset-btn.active { background: rgba(255,77,109,0.15); border-color: var(--accent); color: var(--accent); }
+
+    /* ── DIRECTION + SETTINGS ── */
+    .settings-section {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .setting-item {}
+    .setting-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .dir-btns {
+      display: flex;
+      gap: 6px;
+    }
+    .dir-btn {
+      flex: 1;
+      padding: 6px;
+      background: #1a1a24;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .dir-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dir-btn.active { background: rgba(255,77,109,0.15); border-color: var(--accent); color: var(--accent); }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--muted);
+      transition: color 0.2s;
+      margin-bottom: 6px;
+    }
+    .checkbox-item:hover { color: var(--text); }
+    .checkbox-item input[type=checkbox] { display: none; }
+    .custom-checkbox {
+      width: 14px; height: 14px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: #1a1a24;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      font-size: 10px;
+    }
+    .checkbox-item input:checked + .custom-checkbox {
+      background: rgba(255,77,109,0.2);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── ACTIONS ── */
+    .actions {
+      padding: 12px 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .btn {
+      padding: 9px 10px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: #1a1a24;
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      text-transform: uppercase;
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); transform: translateY(-1px); }
+    .btn-primary {
+      background: linear-gradient(135deg, rgba(255,77,109,0.25), rgba(255,77,109,0.1));
+      border-color: var(--accent);
+      color: var(--accent);
+      grid-column: span 2;
+      font-size: 15px;
+      letter-spacing: 2px;
+    }
+    .btn-primary:hover { background: rgba(255,77,109,0.3); box-shadow: 0 0 16px rgba(255,77,109,0.25); }
+    .btn-primary.running {
+      background: linear-gradient(135deg, rgba(57,217,138,0.2), rgba(57,217,138,0.05));
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    
+
+    /* ── FOOTER ── */
+    .footer {
+      padding: 8px 18px;
+      background: #0a0a0d;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-text {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      color: #333340;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .platform-badges {
+      display: flex;
+      gap: 4px;
+    }
+    .badge {
+      font-family: 'Space Mono', monospace;
+      font-size: 8px;
+      background: #1a1a24;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1px 4px;
+      color: #444460;
+    }
+
+    /* ── OVERLAY hint ── */
+    #overlay-status {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      text-align: center;
+      color: var(--muted);
+      padding: 6px 18px 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-top">
+      <div class="logo-icon">📜</div>
+      <div class="title">Manga<span>Scroll</span></div>
+    </div>
+    <div class="subtitle">Auto-Scroll Engine v1.0</div>
+  </div>
+
+  <div class="status-bar">
+    <div class="status-dot">
+      <div class="dot" id="statusDot"></div>
+      <span id="statusText">IDLE</span>
+    </div>
+    
+  </div>
+
+  <div class="main-section">
+    <div class="toggle-row">
+      <span class="toggle-label">Auto Scroll</span>
+      <label class="toggle">
+        <input type="checkbox" id="autoScrollToggle">
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+      </label>
+    </div>
+
+    <div class="speed-label-row">
+      <span class="speed-label">Scroll Speed</span>
+      <div class="speed-value" id="speedDisplay">7 <span>px/frame</span></div>
+    </div>
+    <div class="slider-wrap">
+      <input type="range" id="speedSlider" min="1" max="20" step="1" value="5">
+    </div>
+    <div class="slider-marks">
+      <span>SLOW</span><span>READ</span><span>FAST</span><span>TURBO</span>
+    </div>
+
+    <div class="presets">
+      <button class="preset-btn" data-speed="1">SLOW</button>
+      <button class="preset-btn active" data-speed="5">READ</button>
+      <button class="preset-btn" data-speed="11">FAST</button>
+      <button class="preset-btn" data-speed="20">TURBO</button>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="setting-item">
+      <div class="setting-title">Direction</div>
+      <div class="dir-btns">
+        <button class="dir-btn active" id="dirDown">▼ DOWN</button>
+        <button class="dir-btn" id="dirUp">▲ UP</button>
+      </div>
+    </div>
+    <div class="setting-item">
+      <div class="setting-title">Options</div>
+      <label class="checkbox-item">
+        <input type="checkbox" id="pauseOnHover" checked>
+        <div class="custom-checkbox">✓</div>
+        Pause on hover
+      </label>
+      <label class="checkbox-item">
+        <input type="checkbox" id="loopScroll">
+        <div class="custom-checkbox">✓</div>
+        Loop scroll
+      </label>
+      <label class="checkbox-item">
+        <input type="checkbox" id="smoothScroll" checked>
+        <div class="custom-checkbox">✓</div>
+        Smooth mode
+      </label>
+      <label class="checkbox-item">
+        <input type="checkbox" id="showHUD">
+        <div class="custom-checkbox">✓</div>
+        Show HUD badge
+      </label>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn" id="scrollTopBtn">⬆ TOP</button>
+    <button class="btn" id="scrollBottomBtn">⬇ BOTTOM</button>
+    <button class="btn btn-primary" id="mainBtn">▶ START SCROLLING</button>
+  </div>
+
+  <div class="footer">
+    <span class="footer-text">MangaScroll Pro © 2026</span>
+    <div class="platform-badges">
+      <span class="badge">MANGADEX</span>
+      <span class="badge">MANGAFIRE</span>
+      <span class="badge">WEEBCENTRAL</span>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
